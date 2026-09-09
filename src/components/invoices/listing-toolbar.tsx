@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -131,13 +131,12 @@ export function ListingToolbar({
         </Button>
       )}
 
-      <Button
-        size="lg"
-        className="ml-auto"
-        render={<Link href="/invoices/new" />}
+      <Link
+        href="/invoices/new"
+        className={buttonVariants({ size: "lg", className: "ml-auto" })}
       >
         + New Invoice
-      </Button>
+      </Link>
     </div>
   );
 }

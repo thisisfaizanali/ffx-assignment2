@@ -4,6 +4,7 @@ import { Download } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { StatusBadge } from "@/components/status-badge";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   Table,
   TableBody,
@@ -26,10 +27,37 @@ const COLUMNS: { key: SortKey; label: string; align?: "right" }[] = [
   { key: "status", label: "Status" },
 ];
 
+const SKELETON_WIDTHS = ["w-24", "w-40", "w-20", "w-20", "w-16", "w-16"];
+
 function isDueSoon(invoice: Invoice): boolean {
   if (invoice.status !== "pending") return false;
   const d = daysUntil(invoice.dueDate);
   return d >= 0 && d <= 7;
+}
+
+function SkeletonRow() {
+  return (
+    <TableRow className="hover:bg-transparent">
+      <TableCell>
+        <Skeleton className="size-4 rounded-[4px]" />
+      </TableCell>
+      {COLUMNS.map((col, i) => (
+        <TableCell key={col.key} className={col.align === "right" ? "text-right" : undefined}>
+          <Skeleton
+            className={cn(
+              "h-3.5",
+              SKELETON_WIDTHS[i],
+              col.key === "status" && "h-5 rounded-full",
+              col.align === "right" && "ml-auto",
+            )}
+          />
+        </TableCell>
+      ))}
+      <TableCell>
+        <Skeleton className="size-6 rounded" />
+      </TableCell>
+    </TableRow>
+  );
 }
 
 interface InvoiceTableProps {
@@ -37,10 +65,21 @@ interface InvoiceTableProps {
   sort: SortKey;
   dir: SortDir;
   onSort: (key: SortKey) => void;
+  isLoading: boolean;
+  hasActiveFilters: boolean;
 }
 
-export function InvoiceTable({ rows, sort, dir, onSort }: InvoiceTableProps) {
+export function InvoiceTable({
+  rows,
+  sort,
+  dir,
+  onSort,
+  isLoading,
+  hasActiveFilters,
+}: InvoiceTableProps) {
   const router = useRouter();
+  const showSkeleton = isLoading && rows.length === 0;
+  const showEmpty = !isLoading && rows.length === 0;
 
   return (
     <div className="overflow-hidden rounded-[10px] border border-border bg-card">
@@ -83,67 +122,76 @@ export function InvoiceTable({ rows, sort, dir, onSort }: InvoiceTableProps) {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {rows.map((row) => {
-            const open = () => router.push(`/invoices/${row.id}`);
-            return (
-              <TableRow
-                key={row.id}
-                role="link"
-                tabIndex={0}
-                onClick={open}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") open();
-                }}
-                className="cursor-pointer"
-              >
-                <TableCell onClick={(e) => e.stopPropagation()}>
-                  <Checkbox aria-label={`Select ${row.number}`} />
-                </TableCell>
-                <TableCell className="font-mono text-[13px] text-foreground">
-                  {row.number}
-                </TableCell>
-                <TableCell className="max-w-[220px] truncate font-medium">
-                  {row.client}
-                </TableCell>
-                <TableCell className="text-[13px] text-muted-foreground">
-                  {formatDate(row.issueDate)}
-                </TableCell>
-                <TableCell className="text-[13px] text-muted-foreground">
-                  {formatDate(row.dueDate)}
-                  {isDueSoon(row) && (
-                    <span className="ml-1.5 text-[10px] font-bold tracking-[0.03em] text-due-soon">
-                      SOON
-                    </span>
-                  )}
-                </TableCell>
-                <TableCell className="text-right font-mono text-[13px] font-semibold">
-                  {formatCurrency(row.amount)}
-                </TableCell>
-                <TableCell>
-                  <StatusBadge status={row.status} />
-                </TableCell>
-                <TableCell
-                  className="text-right"
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  <button
-                    type="button"
-                    aria-label={`Download ${row.number}`}
-                    onClick={() => downloadInvoiceText(row)}
-                    className="rounded p-1 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+          {showSkeleton
+            ? Array.from({ length: 8 }).map((_, i) => <SkeletonRow key={i} />)
+            : rows.map((row) => {
+                const open = () => router.push(`/invoices/${row.id}`);
+                return (
+                  <TableRow
+                    key={row.id}
+                    role="link"
+                    tabIndex={0}
+                    onClick={open}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") open();
+                    }}
+                    className="cursor-pointer"
                   >
-                    <Download className="size-4" />
-                  </button>
-                </TableCell>
-              </TableRow>
-            );
-          })}
+                    <TableCell onClick={(e) => e.stopPropagation()}>
+                      <Checkbox aria-label={`Select ${row.number}`} />
+                    </TableCell>
+                    <TableCell className="font-mono text-[13px] text-foreground">
+                      {row.number}
+                    </TableCell>
+                    <TableCell className="max-w-[220px] truncate font-medium">
+                      {row.client}
+                    </TableCell>
+                    <TableCell className="text-[13px] text-muted-foreground">
+                      {formatDate(row.issueDate)}
+                    </TableCell>
+                    <TableCell className="text-[13px] text-muted-foreground">
+                      {formatDate(row.dueDate)}
+                      {isDueSoon(row) && (
+                        <span className="ml-1.5 text-[10px] font-bold tracking-[0.03em] text-due-soon">
+                          SOON
+                        </span>
+                      )}
+                    </TableCell>
+                    <TableCell className="text-right font-mono text-[13px] font-semibold">
+                      {formatCurrency(row.amount)}
+                    </TableCell>
+                    <TableCell>
+                      <StatusBadge status={row.status} />
+                    </TableCell>
+                    <TableCell
+                      className="text-right"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <button
+                        type="button"
+                        aria-label={`Download ${row.number}`}
+                        onClick={() => downloadInvoiceText(row)}
+                        className="rounded p-1 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+                      >
+                        <Download className="size-4" />
+                      </button>
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
         </TableBody>
       </Table>
 
-      {rows.length === 0 && (
-        <div className="px-5 py-16 text-center text-sm text-muted-foreground">
-          No invoices found.
+      {showEmpty && (
+        <div className="px-5 py-16 text-center">
+          <p className="text-sm font-semibold">
+            {hasActiveFilters ? "No invoices match your filters" : "No invoices yet"}
+          </p>
+          <p className="mt-1 text-[13px] text-muted-foreground">
+            {hasActiveFilters
+              ? "Try adjusting or clearing your filters."
+              : "Create your first invoice to get started."}
+          </p>
         </div>
       )}
     </div>

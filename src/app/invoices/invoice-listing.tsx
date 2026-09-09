@@ -34,8 +34,6 @@ export function InvoiceListing() {
 
       {error ? (
         <ErrorState message={error.message} onRetry={refetch} />
-      ) : isLoading && !data ? (
-        <p className="text-sm text-muted-foreground">Loading…</p>
       ) : (
         <>
           <InvoiceTable
@@ -43,6 +41,8 @@ export function InvoiceListing() {
             sort={query.sort}
             dir={query.dir}
             onSort={setSort}
+            isLoading={isLoading && !data}
+            hasActiveFilters={hasActiveFilters}
           />
           {data && data.total > 0 && (
             <ListingPagination
