@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
 const PAGE_SIZES = [10, 25, 50];
 
 const stepClass =
-  "inline-flex size-8 items-center justify-center rounded-md border border-input text-muted-foreground transition-colors hover:bg-muted disabled:pointer-events-none disabled:opacity-40";
+  "inline-flex size-8 items-center justify-center rounded-md border border-input text-muted-foreground transition-colors outline-none hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-40";
 
 interface Props {
   page: number;
@@ -31,7 +31,7 @@ export function ListingPagination({
 
   return (
     <div className="flex flex-wrap items-center justify-between gap-3">
-      <p className="text-[13px] text-muted-foreground">
+      <p aria-live="polite" className="text-[13px] text-muted-foreground">
         Showing {start}–{end} of {total}
       </p>
 
@@ -76,7 +76,7 @@ export function ListingPagination({
               onClick={() => onPage(p)}
               aria-current={p === page ? "page" : undefined}
               className={cn(
-                "inline-flex h-8 min-w-8 items-center justify-center rounded-md border px-2 text-[13px] font-semibold transition-colors",
+                "inline-flex h-8 min-w-8 items-center justify-center rounded-md border px-2 text-[13px] font-semibold transition-colors outline-none focus-visible:ring-2 focus-visible:ring-ring",
                 p === page
                   ? "border-primary bg-primary text-primary-foreground"
                   : "border-input text-foreground hover:bg-muted",

@@ -49,11 +49,8 @@ export function InvoiceCardList({
   return (
     <div className="space-y-3">
       <div className="flex items-center gap-2">
-        <label htmlFor="mobile-sort" className="sr-only">
-          Sort invoices by
-        </label>
         <select
-          id="mobile-sort"
+          aria-label="Sort invoices by"
           value={sort}
           onChange={(e) => onSort(e.target.value as SortKey)}
           className="h-9 flex-1 rounded-lg border border-input bg-transparent px-2.5 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring"

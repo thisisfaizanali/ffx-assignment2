@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/dialog";
 
 const barButton =
-  "inline-flex items-center gap-1.5 text-[13px] font-medium text-sidebar-foreground/80 transition-colors hover:text-sidebar-foreground disabled:opacity-50";
+  "inline-flex items-center gap-1.5 rounded-sm text-[13px] font-medium text-sidebar-foreground/80 transition-colors outline-none hover:text-sidebar-foreground focus-visible:ring-2 focus-visible:ring-sidebar-primary disabled:opacity-50";
 
 type Busy = "export" | "markPaid" | "delete" | null;
 

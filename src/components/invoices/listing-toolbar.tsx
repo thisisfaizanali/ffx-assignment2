@@ -101,6 +101,10 @@ export function ListingToolbar({
               checked={query.status?.includes(status) ?? false}
               onCheckedChange={() => onToggleStatus(status)}
             >
+              <span
+                aria-hidden="true"
+                className={`mr-2 inline-block size-2 shrink-0 rounded-full ${STATUS_META[status].bar}`}
+              />
               {STATUS_META[status].label}
             </DropdownMenuCheckboxItem>
           ))}

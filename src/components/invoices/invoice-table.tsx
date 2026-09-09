@@ -130,7 +130,7 @@ export function InvoiceTable({
                   type="button"
                   onClick={() => onSort(col.key)}
                   className={cn(
-                    "flex w-full items-center gap-1 text-xs font-medium tracking-[0.05em] text-muted-foreground uppercase transition-colors hover:text-foreground",
+                    "flex w-full items-center gap-1 rounded-sm text-xs font-medium tracking-[0.05em] text-muted-foreground uppercase transition-colors outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring",
                     col.align === "right" && "justify-end",
                   )}
                 >
@@ -211,7 +211,7 @@ export function InvoiceTable({
                       type="button"
                       aria-label={`Download ${row.number}`}
                       onClick={() => downloadInvoiceText(row)}
-                      className="rounded p-1 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+                      className="rounded p-1 text-muted-foreground transition-colors outline-none hover:bg-accent hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring"
                     >
                       <Download className="size-4" />
                     </button>
