@@ -50,7 +50,8 @@ export const listQuerySchema = z.object({
   sort: z.enum(SORT_KEYS).default("issueDate"),
   dir: z.enum(["asc", "desc"]).default("desc"),
   page: z.coerce.number().int().min(1).default(1),
-  pageSize: z.coerce.number().int().min(1).max(100).default(25),
+  // Generous ceiling so CSV export can pull the whole filtered set in one request.
+  pageSize: z.coerce.number().int().min(1).max(5000).default(25),
 });
 
 export const bulkActionSchema = z.object({

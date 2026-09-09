@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useMemo, useState } from "react";
+import { toast } from "sonner";
 import { BulkActionBar } from "@/components/invoices/bulk-action-bar";
 import { ErrorState } from "@/components/error-state";
 import { InvoiceTable } from "@/components/invoices/invoice-table";
@@ -9,6 +10,9 @@ import { ListingToolbar } from "@/components/invoices/listing-toolbar";
 import { useInvoices } from "@/hooks/use-invoices";
 import { useRole } from "@/hooks/use-role";
 import { useTableQuery } from "@/hooks/use-table-query";
+import { api, ApiError } from "@/lib/api";
+import { TODAY } from "@/lib/constants";
+import { downloadCsv, toCsv } from "@/lib/csv";
 import { can } from "@/lib/permissions";
 
 export function InvoiceListing() {
@@ -61,6 +65,27 @@ export function InvoiceListing() {
 
   const clearSelection = useCallback(() => setSelectedIds(new Set()), []);
 
+  const [exporting, setExporting] = useState(false);
+
+  async function exportCsv() {
+    setExporting(true);
+    try {
+      const all = await api.invoices.list({ ...query, page: 1, pageSize: 5000 });
+      const rows =
+        selectedIds.size > 0
+          ? all.data.filter((r) => selectedIds.has(r.id))
+          : all.data;
+      downloadCsv(`invoices-${TODAY}.csv`, toCsv(rows));
+      toast.success(
+        `Exported ${rows.length} invoice${rows.length === 1 ? "" : "s"} to CSV`,
+      );
+    } catch (e) {
+      toast.error(e instanceof ApiError ? e.message : "Export failed");
+    } finally {
+      setExporting(false);
+    }
+  }
+
   return (
     <div className="space-y-4">
       <ListingToolbar
@@ -74,7 +99,13 @@ export function InvoiceListing() {
       />
 
       {canBulk && (
-        <BulkActionBar count={selectedIds.size} onClear={clearSelection} />
+        <BulkActionBar
+          count={selectedIds.size}
+          onClear={clearSelection}
+          onExport={exportCsv}
+          exporting={exporting}
+          canExport={can(role, "export")}
+        />
       )}
 
       {error ? (

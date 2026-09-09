@@ -1,13 +1,26 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
+import { Loader2 } from "lucide-react";
+
+const barButton =
+  "text-[13px] font-medium text-sidebar-foreground/80 transition-colors hover:text-sidebar-foreground disabled:opacity-50";
 
 interface Props {
   count: number;
   onClear: () => void;
+  onExport: () => void;
+  exporting: boolean;
+  canExport: boolean;
 }
 
-export function BulkActionBar({ count, onClear }: Props) {
+export function BulkActionBar({
+  count,
+  onClear,
+  onExport,
+  exporting,
+  canExport,
+}: Props) {
   return (
     <AnimatePresence initial={false}>
       {count > 0 && (
@@ -20,10 +33,23 @@ export function BulkActionBar({ count, onClear }: Props) {
         >
           <span className="text-[13px] font-semibold">{count} selected</span>
           <div className="h-4 w-px bg-sidebar-border" />
+
+          {canExport && (
+            <button
+              type="button"
+              onClick={onExport}
+              disabled={exporting}
+              className={`inline-flex items-center gap-1.5 ${barButton}`}
+            >
+              {exporting && <Loader2 className="size-3.5 animate-spin" />}
+              Export CSV
+            </button>
+          )}
+
           <button
             type="button"
             onClick={onClear}
-            className="ml-auto text-[13px] text-sidebar-foreground/70 transition-colors hover:text-sidebar-foreground"
+            className={`ml-auto ${barButton}`}
           >
             Clear
           </button>
