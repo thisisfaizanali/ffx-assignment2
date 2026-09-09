@@ -28,7 +28,7 @@ export function RoleProvider({ children }: { children: React.ReactNode }) {
       const stored = localStorage.getItem(STORAGE_KEY);
       if (stored && ROLES.includes(stored)) setRoleState(stored as Role);
     } catch {
-      // localStorage unavailable — stick with the default.
+      // localStorage unavailable, so stick with the default.
     }
     setHydrated(true);
   }, []);

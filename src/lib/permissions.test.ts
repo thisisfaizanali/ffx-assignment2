@@ -18,7 +18,7 @@ const GRANTED: Record<Role, Action[]> = {
   viewer: [],
 };
 
-describe("can(role, action) — full matrix", () => {
+describe("can(role, action): full matrix", () => {
   for (const role of Object.keys(GRANTED) as Role[]) {
     for (const action of ALL_ACTIONS) {
       const allowed = GRANTED[role].includes(action);

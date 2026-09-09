@@ -1,7 +1,7 @@
 /**
  * Artificial delay on API responses so loading, skeleton, and error states are
  * actually visible while clicking through the app. This is deliberate scope
- * simulation — a real backend would have real latency — not accidental slowness.
+ * simulation (a real backend would have real latency), not accidental slowness.
  *
  * Full jitter in development; a flat ~80ms in production so the deployed demo
  * still shows its loading states without feeling sluggish.

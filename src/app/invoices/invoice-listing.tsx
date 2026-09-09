@@ -95,7 +95,7 @@ export function InvoiceListing() {
   async function exportCsv() {
     setExporting(true);
     try {
-      // No page / pageSize — the export route returns the full matching set.
+      // No page / pageSize: the export route returns the full matching set.
       const all = await api.invoices.export({
         search: query.search,
         status: query.status,

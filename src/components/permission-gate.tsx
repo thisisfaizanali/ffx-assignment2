@@ -7,7 +7,7 @@ import { can, type Action } from "@/lib/permissions";
 
 /**
  * Client-side route guard. Role lives in the browser (demo control, no auth), so
- * the page shells can't check it — this does, once hydrated.
+ * the page shells can't check it, so this does, once hydrated.
  */
 export function PermissionGate({
   action,

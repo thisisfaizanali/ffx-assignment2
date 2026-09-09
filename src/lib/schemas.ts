@@ -53,7 +53,7 @@ export const listQuerySchema = z.object({
   pageSize: z.coerce.number().int().min(1).max(100).default(25),
 });
 
-/** Same filters as the list, no pagination — CSV export pulls the whole matching set. */
+/** Same filters as the list, no pagination: CSV export pulls the whole matching set. */
 export const exportQuerySchema = listQuerySchema.omit({
   page: true,
   pageSize: true,
