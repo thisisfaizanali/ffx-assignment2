@@ -1,6 +1,7 @@
 "use client";
 
 import { Download } from "lucide-react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { StatusBadge } from "@/components/status-badge";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -124,61 +125,66 @@ export function InvoiceTable({
         <TableBody>
           {showSkeleton
             ? Array.from({ length: 8 }).map((_, i) => <SkeletonRow key={i} />)
-            : rows.map((row) => {
-                const open = () => router.push(`/invoices/${row.id}`);
-                return (
-                  <TableRow
-                    key={row.id}
-                    role="link"
-                    tabIndex={0}
-                    onClick={open}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter") open();
-                    }}
-                    className="cursor-pointer"
-                  >
-                    <TableCell onClick={(e) => e.stopPropagation()}>
-                      <Checkbox aria-label={`Select ${row.number}`} />
-                    </TableCell>
-                    <TableCell className="font-mono text-[13px] text-foreground">
-                      {row.number}
-                    </TableCell>
-                    <TableCell className="max-w-[220px] truncate font-medium">
-                      {row.client}
-                    </TableCell>
-                    <TableCell className="text-[13px] text-muted-foreground">
-                      {formatDate(row.issueDate)}
-                    </TableCell>
-                    <TableCell className="text-[13px] text-muted-foreground">
-                      {formatDate(row.dueDate)}
-                      {isDueSoon(row) && (
-                        <span className="ml-1.5 text-[10px] font-bold tracking-[0.03em] text-due-soon">
-                          SOON
-                        </span>
-                      )}
-                    </TableCell>
-                    <TableCell className="text-right font-mono text-[13px] font-semibold">
-                      {formatCurrency(row.amount)}
-                    </TableCell>
-                    <TableCell>
-                      <StatusBadge status={row.status} />
-                    </TableCell>
-                    <TableCell
-                      className="text-right"
-                      onClick={(e) => e.stopPropagation()}
+            : rows.map((row) => (
+                <TableRow
+                  key={row.id}
+                  onClick={(e) => {
+                    if (
+                      e.target instanceof HTMLElement &&
+                      e.target.closest("a, button, input, [role=checkbox]")
+                    ) {
+                      return;
+                    }
+                    router.push(`/invoices/${row.id}`);
+                  }}
+                  className="cursor-pointer"
+                >
+                  <TableCell>
+                    <Checkbox aria-label={`Select ${row.number}`} />
+                  </TableCell>
+                  <TableCell className="font-mono text-[13px]">
+                    <Link
+                      href={`/invoices/${row.id}`}
+                      className="text-foreground outline-none hover:underline focus-visible:underline"
                     >
-                      <button
-                        type="button"
-                        aria-label={`Download ${row.number}`}
-                        onClick={() => downloadInvoiceText(row)}
-                        className="rounded p-1 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
-                      >
-                        <Download className="size-4" />
-                      </button>
-                    </TableCell>
-                  </TableRow>
-                );
-              })}
+                      {row.number}
+                    </Link>
+                  </TableCell>
+                  <TableCell className="max-w-[220px] truncate font-medium">
+                    {row.client}
+                  </TableCell>
+                  <TableCell className="text-[13px] text-muted-foreground">
+                    {formatDate(row.issueDate)}
+                  </TableCell>
+                  <TableCell className="text-[13px] text-muted-foreground">
+                    {formatDate(row.dueDate)}
+                    {isDueSoon(row) && (
+                      <span className="ml-1.5 text-[10px] font-bold tracking-[0.03em] text-due-soon">
+                        SOON
+                      </span>
+                    )}
+                  </TableCell>
+                  <TableCell className="text-right font-mono text-[13px] font-semibold">
+                    {formatCurrency(row.amount)}
+                  </TableCell>
+                  <TableCell>
+                    <StatusBadge status={row.status} />
+                  </TableCell>
+                  <TableCell
+                    className="text-right"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <button
+                      type="button"
+                      aria-label={`Download ${row.number}`}
+                      onClick={() => downloadInvoiceText(row)}
+                      className="rounded p-1 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+                    >
+                      <Download className="size-4" />
+                    </button>
+                  </TableCell>
+                </TableRow>
+              ))}
         </TableBody>
       </Table>
 
