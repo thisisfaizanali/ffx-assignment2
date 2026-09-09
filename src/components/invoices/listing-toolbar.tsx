@@ -76,7 +76,7 @@ export function ListingToolbar({
   onClear,
   hasActiveFilters,
 }: ToolbarProps) {
-  const { role } = useRole();
+  const { role, hydrated } = useRole();
   const activeStatusCount = query.status?.length ?? 0;
 
   return (
@@ -134,7 +134,7 @@ export function ListingToolbar({
         </Button>
       )}
 
-      {can(role, "create") && (
+      {hydrated && can(role, "create") && (
         <Link
           href="/invoices/new"
           className={buttonVariants({ size: "lg", className: "ml-auto" })}

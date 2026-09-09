@@ -34,15 +34,18 @@ export function InvoiceActions({
   invoice: Invoice;
   onUpdate: (invoice: Invoice) => void;
 }) {
-  const { role } = useRole();
+  const { role, hydrated } = useRole();
   const router = useRouter();
   const [busy, setBusy] = useState<"markPaid" | "delete" | null>(null);
   const [confirmOpen, setConfirmOpen] = useState(false);
 
+  const allow = (action: Parameters<typeof can>[1]) =>
+    hydrated && can(role, action);
+
   const showReminder =
-    can(role, "sendReminder") && REMINDABLE.has(invoice.status);
+    allow("sendReminder") && REMINDABLE.has(invoice.status);
   const showMarkPaid =
-    can(role, "markPaid") &&
+    allow("markPaid") &&
     invoice.status !== "paid" &&
     invoice.status !== "cancelled";
 
@@ -97,7 +100,7 @@ export function InvoiceActions({
         </Button>
       )}
 
-      {can(role, "edit") && (
+      {allow("edit") && (
         <Link
           href={`/invoices/${invoice.id}/edit`}
           className={buttonVariants({ variant: "outline", size: "lg" })}
@@ -106,7 +109,7 @@ export function InvoiceActions({
         </Link>
       )}
 
-      {can(role, "delete") && (
+      {allow("delete") && (
         <Dialog open={confirmOpen} onOpenChange={setConfirmOpen}>
           <DialogTrigger
             render={

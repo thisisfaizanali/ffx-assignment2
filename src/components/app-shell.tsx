@@ -18,7 +18,7 @@ function isActive(pathname: string, href: string) {
 
 function Sidebar() {
   const pathname = usePathname();
-  const { role, setRole } = useRole();
+  const { role, setRole, hydrated } = useRole();
 
   return (
     <aside className="sticky top-0 flex h-screen w-[220px] shrink-0 flex-col overflow-y-auto bg-sidebar px-[18px] py-[26px] text-sidebar-foreground">
@@ -64,7 +64,7 @@ function Sidebar() {
           );
         })}
 
-        {can(role, "create") && (
+        {hydrated && can(role, "create") && (
           <Link
             href="/invoices/new"
             className="mt-2.5 flex items-center gap-2.5 rounded-md border border-dashed border-sidebar-border px-3 py-2.5 text-[13px] font-semibold text-sidebar-foreground/90 transition-colors hover:bg-sidebar-accent/50"

@@ -13,12 +13,15 @@ const ROLES: readonly string[] = ["admin", "accountant", "viewer"];
 export interface RoleContextValue {
   role: Role;
   setRole: (role: Role) => void;
+  /** False until the persisted role has been read on the client. */
+  hydrated: boolean;
 }
 
 export const RoleContext = createContext<RoleContextValue | null>(null);
 
 export function RoleProvider({ children }: { children: React.ReactNode }) {
   const [role, setRoleState] = useState<Role>("admin");
+  const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
     try {
@@ -27,6 +30,7 @@ export function RoleProvider({ children }: { children: React.ReactNode }) {
     } catch {
       // localStorage unavailable — stick with the default.
     }
+    setHydrated(true);
   }, []);
 
   const setRole = useCallback((next: Role) => {
@@ -38,5 +42,7 @@ export function RoleProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
-  return <RoleContext value={{ role, setRole }}>{children}</RoleContext>;
+  return (
+    <RoleContext value={{ role, setRole, hydrated }}>{children}</RoleContext>
+  );
 }
