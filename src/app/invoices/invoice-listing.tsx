@@ -4,6 +4,7 @@ import { useCallback, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { BulkActionBar } from "@/components/invoices/bulk-action-bar";
 import { ErrorState } from "@/components/error-state";
+import { InvoiceCardList } from "@/components/invoices/invoice-card-list";
 import { InvoiceTable } from "@/components/invoices/invoice-table";
 import { ListingPagination } from "@/components/invoices/listing-pagination";
 import { ListingToolbar } from "@/components/invoices/listing-toolbar";
@@ -148,20 +149,35 @@ export function InvoiceListing() {
         <ErrorState message={error.message} onRetry={refetch} />
       ) : (
         <>
-          <InvoiceTable
-            rows={data?.data ?? []}
-            sort={query.sort}
-            dir={query.dir}
-            onSort={setSort}
-            isLoading={isLoading && !data}
-            hasActiveFilters={hasActiveFilters}
-            showSelection={canBulk}
-            selectedIds={selectedIds}
-            allOnPageSelected={allOnPageSelected}
-            pageIndeterminate={pageIndeterminate}
-            onToggleRow={toggleRow}
-            onTogglePage={togglePage}
-          />
+          <div className="hidden md:block">
+            <InvoiceTable
+              rows={data?.data ?? []}
+              sort={query.sort}
+              dir={query.dir}
+              onSort={setSort}
+              isLoading={isLoading && !data}
+              hasActiveFilters={hasActiveFilters}
+              showSelection={canBulk}
+              selectedIds={selectedIds}
+              allOnPageSelected={allOnPageSelected}
+              pageIndeterminate={pageIndeterminate}
+              onToggleRow={toggleRow}
+              onTogglePage={togglePage}
+            />
+          </div>
+          <div className="md:hidden">
+            <InvoiceCardList
+              rows={data?.data ?? []}
+              sort={query.sort}
+              dir={query.dir}
+              onSort={setSort}
+              isLoading={isLoading && !data}
+              hasActiveFilters={hasActiveFilters}
+              showSelection={canBulk}
+              selectedIds={selectedIds}
+              onToggleRow={toggleRow}
+            />
+          </div>
           {data && data.total > 0 && (
             <ListingPagination
               page={data.page}
