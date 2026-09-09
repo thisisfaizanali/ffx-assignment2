@@ -154,7 +154,6 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
           <main id="main-content" className="flex min-w-0 flex-1 flex-col">
             <motion.div
-              key={pathname}
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.2, ease: "easeOut" }}
