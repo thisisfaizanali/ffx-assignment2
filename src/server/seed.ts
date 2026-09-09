@@ -5,21 +5,24 @@ const DAY = 86_400_000;
 const TODAY_MS = Date.parse(`${TODAY}T00:00:00Z`);
 
 const DESCRIPTIONS = [
-  "Consulting services — Q1 engagement",
-  "Website & platform maintenance retainer",
-  "Freight & logistics coordination",
-  "Custom fabrication — batch run",
-  "Software license renewal",
-  "Warehouse storage — monthly",
-  "Design & branding package",
-  "Equipment rental — 2 weeks",
-  "Bulk material supply",
-  "Quality assurance audit",
-  "On-site installation service",
-  "Advisory retainer — quarterly",
+  "Full truckload haulage, Pune to Nashik",
+  "Part load consignment, multi-drop",
+  "Warehouse storage, monthly",
+  "Freight forwarding and documentation",
+  "Last mile delivery, metro zone",
+  "Reefer container transport",
+  "Loading and unloading charges",
+  "Packaging and palletisation",
+  "Multi-modal transport coordination",
+  "Detention and demurrage",
+  "Transit insurance cover",
+  "Fuel surcharge adjustment",
 ];
 
-const RATES = [45, 60, 75, 90, 120, 150, 180, 220, 350, 480, 650, 900];
+const RATES = [
+  1800, 2400, 3200, 4500, 6000, 8500, 12_000, 18_000, 26_000, 40_000, 65_000,
+  90_000,
+];
 
 /** Weighted so the mix looks like a real ledger: mostly paid, some in flight, a few dead. */
 const STATUS_MIX: InvoiceStatus[] = [

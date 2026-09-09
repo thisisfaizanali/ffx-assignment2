@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useEffect, useRef } from "react";
 import { buttonVariants } from "@/components/ui/button";
 import { StatusBadge } from "@/components/status-badge";
-import { TAX_RATE } from "@/lib/constants";
+import { TAX_LABEL } from "@/lib/constants";
 import { formatCurrency, formatDate } from "@/lib/format";
 import type { Invoice } from "@/lib/types";
 
@@ -114,7 +114,7 @@ export function PrintInvoice({ invoice }: { invoice: Invoice }) {
               </span>
             </div>
             <div className="flex justify-between text-muted-foreground">
-              <span>Tax ({Math.round(TAX_RATE * 100)}%)</span>
+              <span>{TAX_LABEL}</span>
               <span className="font-mono">{formatCurrency(invoice.tax)}</span>
             </div>
             <div className="mt-1 flex justify-between border-t border-border pt-1.5 text-base font-bold">

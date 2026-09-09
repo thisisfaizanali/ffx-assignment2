@@ -13,11 +13,10 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { TAX_RATE } from "@/lib/constants";
+import { TAX_LABEL } from "@/lib/constants";
 import { formatCurrency, formatDate } from "@/lib/format";
 import type { Invoice } from "@/lib/types";
 
-const taxLabel = `Tax (${Math.round(TAX_RATE * 100)}%)`;
 
 function TotalsRow({
   label,
@@ -125,7 +124,7 @@ export function InvoiceDetailView({
                   label="Subtotal"
                   value={formatCurrency(invoice.subtotal)}
                 />
-                <TotalsRow label={taxLabel} value={formatCurrency(invoice.tax)} />
+                <TotalsRow label={TAX_LABEL} value={formatCurrency(invoice.tax)} />
                 <TotalsRow
                   label="Total"
                   value={formatCurrency(invoice.amount)}

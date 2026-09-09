@@ -102,7 +102,7 @@ hidden.
 - **Seed anchor.** `TODAY` is computed from the real date at module load, so the
   "overdue" and "due soon" windows slide forward with real time while
   `mulberry32(42)` keeps the dataset shape identical run to run.
-- **USD, `en-US`, 8% tax** throughout.
+- **INR, `en-IN`, 18% GST** throughout, matching Indian freight invoicing.
 - **Artificial API latency** (180 to 420ms in development, ~80ms in production)
   so loading and skeleton states are observable.
 

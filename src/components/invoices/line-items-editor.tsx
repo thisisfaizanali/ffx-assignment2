@@ -9,14 +9,13 @@ import {
 } from "react-hook-form";
 import type { z } from "zod";
 import { Input } from "@/components/ui/input";
-import { TAX_RATE } from "@/lib/constants";
+import { TAX_LABEL, TAX_RATE } from "@/lib/constants";
 import { formatCurrency } from "@/lib/format";
 import type { invoiceInputSchema } from "@/lib/schemas";
 
 type FormValues = z.infer<typeof invoiceInputSchema>;
 
 const num = (v: unknown) => (Number.isFinite(Number(v)) ? Number(v) : 0);
-const taxLabel = `Tax (${Math.round(TAX_RATE * 100)}%)`;
 
 function RowAmount({
   control,
@@ -144,7 +143,7 @@ export function InvoiceTotals({ control }: { control: Control<FormValues> }) {
   return (
     <div className="mb-6 flex flex-col items-end gap-1.5 border-t border-border py-4 text-[13px] text-muted-foreground">
       {row("Subtotal", subtotal)}
-      {row(taxLabel, tax)}
+      {row(TAX_LABEL, tax)}
       {row("Total", subtotal + tax, true)}
     </div>
   );

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { TODAY } from "@/lib/constants";
+import { COMPANIES, TODAY } from "@/lib/constants";
 import { addDays } from "@/lib/format";
 import { filterSort, query } from "@/server/store";
 
@@ -24,13 +24,14 @@ describe("store filterSort", () => {
   });
 
   it("searches number and client, case-insensitively", () => {
-    const rows = filterSort({ ...base, search: "meridian" });
+    const term = COMPANIES[0].split(" ")[0].toLowerCase();
+    const rows = filterSort({ ...base, search: term });
     expect(rows.length).toBeGreaterThan(0);
     expect(
       rows.every(
         (r) =>
-          r.client.toLowerCase().includes("meridian") ||
-          r.number.toLowerCase().includes("meridian"),
+          r.client.toLowerCase().includes(term) ||
+          r.number.toLowerCase().includes(term),
       ),
     ).toBe(true);
   });
