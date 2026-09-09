@@ -238,3 +238,26 @@ export function InvoiceTable({
     </div>
   );
 }
+
+const NO_SELECTION = new Set<string>();
+const noop = () => {};
+
+/** The table in its loading state, for use as a Suspense fallback. */
+export function InvoiceTableFallback() {
+  return (
+    <InvoiceTable
+      rows={[]}
+      sort="issueDate"
+      dir="desc"
+      onSort={noop}
+      isLoading
+      hasActiveFilters={false}
+      showSelection={false}
+      selectedIds={NO_SELECTION}
+      allOnPageSelected={false}
+      pageIndeterminate={false}
+      onToggleRow={noop}
+      onTogglePage={noop}
+    />
+  );
+}
