@@ -99,10 +99,12 @@ export function BulkActionBar({
               </DialogTrigger>
               <DialogContent>
                 <DialogHeader>
-                  <DialogTitle>Delete {count} invoices?</DialogTitle>
+                  <DialogTitle>
+                    Delete {count} {count === 1 ? "invoice" : "invoices"}?
+                  </DialogTitle>
                   <DialogDescription>
-                    The selected invoices will be permanently removed. This can’t
-                    be undone.
+                    {count === 1 ? "This invoice" : "These invoices"} will be
+                    permanently removed. This can’t be undone.
                   </DialogDescription>
                 </DialogHeader>
                 <DialogFooter>

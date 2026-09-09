@@ -10,6 +10,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
+import { useRole } from "@/hooks/use-role";
+import { can } from "@/lib/permissions";
 import type { ListQuery } from "@/lib/schemas";
 import { STATUS_META, STATUS_ORDER } from "@/lib/status";
 import type { InvoiceStatus } from "@/lib/types";
@@ -74,6 +76,7 @@ export function ListingToolbar({
   onClear,
   hasActiveFilters,
 }: ToolbarProps) {
+  const { role } = useRole();
   const activeStatusCount = query.status?.length ?? 0;
 
   return (
@@ -131,12 +134,14 @@ export function ListingToolbar({
         </Button>
       )}
 
-      <Link
-        href="/invoices/new"
-        className={buttonVariants({ size: "lg", className: "ml-auto" })}
-      >
-        + New Invoice
-      </Link>
+      {can(role, "create") && (
+        <Link
+          href="/invoices/new"
+          className={buttonVariants({ size: "lg", className: "ml-auto" })}
+        >
+          + New Invoice
+        </Link>
+      )}
     </div>
   );
 }

@@ -1,16 +1,13 @@
 "use client";
 
-import type { Role } from "@/lib/types";
+import { useContext } from "react";
+import {
+  RoleContext,
+  type RoleContextValue,
+} from "@/components/role-provider";
 
-export interface RoleState {
-  role: Role;
-  setRole: (role: Role) => void;
-}
-
-/**
- * The active demo role. Backed by RoleContext + the sidebar selector once that
- * provider is wired; a fixed admin until then.
- */
-export function useRole(): RoleState {
-  return { role: "admin", setRole: () => {} };
+export function useRole(): RoleContextValue {
+  const ctx = useContext(RoleContext);
+  if (!ctx) throw new Error("useRole must be used within a RoleProvider");
+  return ctx;
 }

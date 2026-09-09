@@ -2,6 +2,9 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useRole } from "@/hooks/use-role";
+import { can } from "@/lib/permissions";
+import type { Role } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
 const NAV = [
@@ -15,6 +18,7 @@ function isActive(pathname: string, href: string) {
 
 function Sidebar() {
   const pathname = usePathname();
+  const { role, setRole } = useRole();
 
   return (
     <aside className="sticky top-0 flex h-screen w-[220px] shrink-0 flex-col overflow-y-auto bg-sidebar px-[18px] py-[26px] text-sidebar-foreground">
@@ -60,21 +64,23 @@ function Sidebar() {
           );
         })}
 
-        <Link
-          href="/invoices/new"
-          className="mt-2.5 flex items-center gap-2.5 rounded-md border border-dashed border-sidebar-border px-3 py-2.5 text-[13px] font-semibold text-sidebar-foreground/90 transition-colors hover:bg-sidebar-accent/50"
-        >
-          + New Invoice
-        </Link>
+        {can(role, "create") && (
+          <Link
+            href="/invoices/new"
+            className="mt-2.5 flex items-center gap-2.5 rounded-md border border-dashed border-sidebar-border px-3 py-2.5 text-[13px] font-semibold text-sidebar-foreground/90 transition-colors hover:bg-sidebar-accent/50"
+          >
+            + New Invoice
+          </Link>
+        )}
       </nav>
 
       <div className="mt-auto border-t border-sidebar-border pt-4">
         <div className="mb-2 text-[11px] uppercase tracking-[0.06em] text-sidebar-foreground/55">
           Signed in as
         </div>
-        {/* Role switching is wired to app state in a later milestone. */}
         <select
-          defaultValue="admin"
+          value={role}
+          onChange={(e) => setRole(e.target.value as Role)}
           aria-label="Active role"
           className="w-full rounded-md border border-sidebar-border bg-sidebar-accent px-2.5 py-2 text-[13px] font-semibold text-sidebar-accent-foreground outline-none"
         >
