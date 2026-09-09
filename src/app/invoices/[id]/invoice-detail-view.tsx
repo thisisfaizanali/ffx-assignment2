@@ -1,6 +1,8 @@
 "use client";
 
 import Link from "next/link";
+import { useState } from "react";
+import { InvoiceActions } from "@/components/invoices/invoice-actions";
 import { PageHeader } from "@/components/page-header";
 import { StatusBadge } from "@/components/status-badge";
 import {
@@ -51,7 +53,13 @@ function MetaItem({ label, value }: { label: string; value: string }) {
   );
 }
 
-export function InvoiceDetailView({ invoice }: { invoice: Invoice }) {
+export function InvoiceDetailView({
+  invoice: initialInvoice,
+}: {
+  invoice: Invoice;
+}) {
+  const [invoice, setInvoice] = useState(initialInvoice);
+
   return (
     <>
       <PageHeader title={invoice.number} />
@@ -79,6 +87,7 @@ export function InvoiceDetailView({ invoice }: { invoice: Invoice }) {
                 {invoice.client}
               </p>
             </div>
+            <InvoiceActions invoice={invoice} onUpdate={setInvoice} />
           </div>
 
           <div className="grid grid-cols-1 items-start gap-5 lg:grid-cols-[1.6fr_1fr]">
