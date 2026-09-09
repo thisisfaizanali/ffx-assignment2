@@ -11,6 +11,7 @@ export function InvoiceListing() {
     query,
     setFilters,
     toggleStatus,
+    setSort,
     clearFilters,
     hasActiveFilters,
   } = useTableQuery();
@@ -33,7 +34,12 @@ export function InvoiceListing() {
       ) : isLoading && !data ? (
         <p className="text-sm text-muted-foreground">Loading…</p>
       ) : (
-        <InvoiceTable rows={data?.data ?? []} />
+        <InvoiceTable
+          rows={data?.data ?? []}
+          sort={query.sort}
+          dir={query.dir}
+          onSort={setSort}
+        />
       )}
     </div>
   );

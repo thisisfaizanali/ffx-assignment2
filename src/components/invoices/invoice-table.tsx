@@ -14,7 +14,17 @@ import {
 } from "@/components/ui/table";
 import { downloadInvoiceText } from "@/lib/download";
 import { daysUntil, formatCurrency, formatDate } from "@/lib/format";
-import type { Invoice } from "@/lib/types";
+import { cn } from "@/lib/utils";
+import type { Invoice, SortDir, SortKey } from "@/lib/types";
+
+const COLUMNS: { key: SortKey; label: string; align?: "right" }[] = [
+  { key: "number", label: "Invoice" },
+  { key: "client", label: "Client" },
+  { key: "issueDate", label: "Issued" },
+  { key: "dueDate", label: "Due" },
+  { key: "amount", label: "Amount", align: "right" },
+  { key: "status", label: "Status" },
+];
 
 function isDueSoon(invoice: Invoice): boolean {
   if (invoice.status !== "pending") return false;
@@ -22,7 +32,14 @@ function isDueSoon(invoice: Invoice): boolean {
   return d >= 0 && d <= 7;
 }
 
-export function InvoiceTable({ rows }: { rows: Invoice[] }) {
+interface InvoiceTableProps {
+  rows: Invoice[];
+  sort: SortKey;
+  dir: SortDir;
+  onSort: (key: SortKey) => void;
+}
+
+export function InvoiceTable({ rows, sort, dir, onSort }: InvoiceTableProps) {
   const router = useRouter();
 
   return (
@@ -33,12 +50,33 @@ export function InvoiceTable({ rows }: { rows: Invoice[] }) {
             <TableHead className="w-10">
               <span className="sr-only">Select</span>
             </TableHead>
-            <TableHead>Invoice</TableHead>
-            <TableHead>Client</TableHead>
-            <TableHead>Issued</TableHead>
-            <TableHead>Due</TableHead>
-            <TableHead className="text-right">Amount</TableHead>
-            <TableHead>Status</TableHead>
+            {COLUMNS.map((col) => (
+              <TableHead
+                key={col.key}
+                aria-sort={
+                  sort === col.key
+                    ? dir === "asc"
+                      ? "ascending"
+                      : "descending"
+                    : "none"
+                }
+                className={col.align === "right" ? "text-right" : undefined}
+              >
+                <button
+                  type="button"
+                  onClick={() => onSort(col.key)}
+                  className={cn(
+                    "flex w-full items-center gap-1 text-xs font-medium tracking-[0.05em] text-muted-foreground uppercase transition-colors hover:text-foreground",
+                    col.align === "right" && "justify-end",
+                  )}
+                >
+                  {col.label}
+                  {sort === col.key && (
+                    <span aria-hidden="true">{dir === "asc" ? "▲" : "▼"}</span>
+                  )}
+                </button>
+              </TableHead>
+            ))}
             <TableHead className="w-12">
               <span className="sr-only">Download</span>
             </TableHead>
