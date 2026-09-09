@@ -1,12 +1,22 @@
 import { NextResponse } from "next/server";
 import type { ZodError } from "zod";
 
-/** Flatten a Zod error into one readable sentence for the response body. */
+/**
+ * A flattened `error` sentence plus a `fields` map (`path -> message`) keyed to
+ * match react-hook-form field names, so the form can surface errors inline.
+ */
 export function badRequest(error: ZodError) {
+  const fields: Record<string, string> = {};
+  for (const issue of error.issues) {
+    if (issue.path.length) {
+      const key = issue.path.join(".");
+      fields[key] ??= issue.message;
+    }
+  }
   const message = error.issues
     .map((i) => (i.path.length ? `${i.path.join(".")}: ${i.message}` : i.message))
     .join("; ");
-  return NextResponse.json({ error: message }, { status: 400 });
+  return NextResponse.json({ error: message, fields }, { status: 400 });
 }
 
 export function notFound(message = "Not found") {

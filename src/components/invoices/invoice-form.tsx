@@ -1,30 +1,32 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
   useFieldArray,
   useForm,
-  useWatch,
-  type Control,
+  type FieldPath,
   type Resolver,
 } from "react-hook-form";
 import { toast } from "sonner";
 import type { z } from "zod";
+import {
+  InvoiceTotals,
+  LineItemsEditor,
+} from "@/components/invoices/line-items-editor";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { api, ApiError } from "@/lib/api";
-import { COMPANIES, TAX_RATE, TODAY } from "@/lib/constants";
-import { addDays, formatCurrency } from "@/lib/format";
+import { COMPANIES, TODAY } from "@/lib/constants";
+import { addDays } from "@/lib/format";
 import { invoiceInputSchema } from "@/lib/schemas";
 import type { Invoice } from "@/lib/types";
 
 type FormValues = z.infer<typeof invoiceInputSchema>;
-
-const taxLabel = `Tax (${Math.round(TAX_RATE * 100)}%)`;
 
 const emptyValues: FormValues = {
   client: "",
@@ -49,53 +51,10 @@ function toFormValues(invoice: Invoice): FormValues {
   };
 }
 
-const num = (v: unknown) => (Number.isFinite(Number(v)) ? Number(v) : 0);
-
-function RowAmount({
-  control,
-  index,
-}: {
-  control: Control<FormValues>;
-  index: number;
-}) {
-  const item = useWatch({ control, name: `lineItems.${index}` });
-  return (
-    <div className="flex items-center justify-end font-mono text-[13px] font-semibold">
-      {formatCurrency(num(item?.qty) * num(item?.rate))}
-    </div>
-  );
-}
-
-function Totals({ control }: { control: Control<FormValues> }) {
-  const items = useWatch({ control, name: "lineItems" }) ?? [];
-  const subtotal = items.reduce(
-    (sum, li) => sum + num(li?.qty) * num(li?.rate),
-    0,
-  );
-  const tax = subtotal * TAX_RATE;
-
-  return (
-    <div className="mb-6 flex flex-col items-end gap-1.5 border-t border-border py-4 text-[13px] text-muted-foreground">
-      <div className="flex gap-6">
-        <span>Subtotal</span>
-        <span className="w-[100px] text-right font-mono">
-          {formatCurrency(subtotal)}
-        </span>
-      </div>
-      <div className="flex gap-6">
-        <span>{taxLabel}</span>
-        <span className="w-[100px] text-right font-mono">
-          {formatCurrency(tax)}
-        </span>
-      </div>
-      <div className="flex gap-6 text-base font-bold text-foreground">
-        <span>Total</span>
-        <span className="w-[100px] text-right font-mono">
-          {formatCurrency(subtotal + tax)}
-        </span>
-      </div>
-    </div>
-  );
+function FieldError({ message }: { message?: string }) {
+  return message ? (
+    <p className="mt-1 text-[12px] text-destructive">{message}</p>
+  ) : null;
 }
 
 interface Props {
@@ -105,12 +64,18 @@ interface Props {
 
 export function InvoiceForm({ mode, invoice }: Props) {
   const router = useRouter();
-  const { control, register, handleSubmit } = useForm<FormValues>({
+  const {
+    control,
+    register,
+    handleSubmit,
+    setError,
+    formState: { errors, isSubmitting },
+  } = useForm<FormValues>({
     resolver: zodResolver(invoiceInputSchema) as Resolver<FormValues>,
     mode: "onTouched",
     defaultValues: invoice ? toFormValues(invoice) : emptyValues,
   });
-  const { fields, append, remove } = useFieldArray({
+  const fieldArray = useFieldArray({
     control,
     name: "lineItems",
     keyName: "key",
@@ -128,11 +93,19 @@ export function InvoiceForm({ mode, invoice }: Props) {
       toast.success(status === "draft" ? "Draft saved" : "Invoice sent");
       router.push(`/invoices/${saved.id}`);
     } catch (e) {
-      toast.error(
-        e instanceof ApiError ? e.message : "Couldn’t save the invoice",
-      );
+      if (e instanceof ApiError) {
+        toast.error(e.message);
+        const fields = (e.body as { fields?: Record<string, string> })?.fields;
+        for (const [name, message] of Object.entries(fields ?? {})) {
+          setError(name as FieldPath<FormValues>, { message });
+        }
+      } else {
+        toast.error("Couldn’t save the invoice");
+      }
     }
   }
+
+  const pending = isSubmitting;
 
   return (
     <div className="mx-auto max-w-[820px]">
@@ -157,80 +130,42 @@ export function InvoiceForm({ mode, invoice }: Props) {
               id="client"
               list="known-companies"
               placeholder="Company name"
+              aria-invalid={!!errors.client}
               className="mt-1.5 h-9"
               {...register("client")}
             />
+            <FieldError message={errors.client?.message} />
           </div>
           <div>
             <Label htmlFor="issueDate">Issue Date</Label>
             <Input
               id="issueDate"
               type="date"
+              aria-invalid={!!errors.issueDate}
               className="mt-1.5 h-9"
               {...register("issueDate")}
             />
+            <FieldError message={errors.issueDate?.message} />
           </div>
           <div>
             <Label htmlFor="dueDate">Due Date</Label>
             <Input
               id="dueDate"
               type="date"
+              aria-invalid={!!errors.dueDate}
               className="mt-1.5 h-9"
               {...register("dueDate")}
             />
+            <FieldError message={errors.dueDate?.message} />
           </div>
         </div>
 
-        <div className="mb-2 text-xs font-semibold text-foreground/80">
-          Line Items
-        </div>
-        <div className="mb-3.5 overflow-hidden rounded-lg border border-border">
-          {fields.map((field, i) => (
-            <div
-              key={field.key}
-              className="grid grid-cols-[2.4fr_0.7fr_0.9fr_0.9fr_32px] items-center gap-2.5 border-b border-border p-3 last:border-b-0"
-            >
-              <Input
-                aria-label={`Line ${i + 1} description`}
-                placeholder="Description"
-                className="h-9"
-                {...register(`lineItems.${i}.description`)}
-              />
-              <Input
-                aria-label={`Line ${i + 1} quantity`}
-                type="number"
-                min={1}
-                className="h-9"
-                {...register(`lineItems.${i}.qty`, { valueAsNumber: true })}
-              />
-              <Input
-                aria-label={`Line ${i + 1} rate`}
-                type="number"
-                min={0}
-                step="0.01"
-                className="h-9"
-                {...register(`lineItems.${i}.rate`, { valueAsNumber: true })}
-              />
-              <RowAmount control={control} index={i} />
-              <button
-                type="button"
-                aria-label={`Remove line ${i + 1}`}
-                onClick={() => remove(i)}
-                disabled={fields.length === 1}
-                className="text-muted-foreground transition-colors hover:text-foreground disabled:opacity-30"
-              >
-                ×
-              </button>
-            </div>
-          ))}
-        </div>
-        <button
-          type="button"
-          onClick={() => append({ description: "", qty: 1, rate: 0 })}
-          className="mb-6 rounded-md border border-dashed border-border px-3.5 py-2 text-[13px] font-semibold text-primary transition-colors hover:bg-accent"
-        >
-          + Add line item
-        </button>
+        <LineItemsEditor
+          control={control}
+          register={register}
+          fieldArray={fieldArray}
+          errors={errors.lineItems}
+        />
 
         <div className="mb-6">
           <Label htmlFor="notes">Notes (optional)</Label>
@@ -238,16 +173,19 @@ export function InvoiceForm({ mode, invoice }: Props) {
             id="notes"
             rows={2}
             placeholder="Payment terms, thank-you note, etc."
+            aria-invalid={!!errors.notes}
             className="mt-1.5"
             {...register("notes")}
           />
+          <FieldError message={errors.notes?.message} />
         </div>
 
-        <Totals control={control} />
+        <InvoiceTotals control={control} />
 
         <div className="flex flex-wrap justify-end gap-2.5">
           <button
             type="button"
+            disabled={pending}
             onClick={handleSubmit((v) => submit(v, "draft"))}
             className={buttonVariants({ variant: "outline", size: "lg" })}
           >
@@ -256,8 +194,10 @@ export function InvoiceForm({ mode, invoice }: Props) {
           <Button
             type="button"
             size="lg"
+            disabled={pending}
             onClick={handleSubmit((v) => submit(v, "pending"))}
           >
+            {pending && <Loader2 className="size-4 animate-spin" />}
             Send Invoice
           </Button>
         </div>
