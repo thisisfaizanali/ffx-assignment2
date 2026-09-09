@@ -3,6 +3,7 @@
 /* eslint-disable react-hooks/set-state-in-effect --
    Closing the mobile drawer is a sync to an external system (the router). */
 
+import { MotionConfig, motion } from "framer-motion";
 import { Menu } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -115,45 +116,55 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   }, [pathname]);
 
   return (
-    <div className="flex min-h-screen">
-      <aside className="sticky top-0 hidden h-screen w-[220px] shrink-0 overflow-y-auto lg:block">
-        <SidebarNav />
-      </aside>
+    <MotionConfig reducedMotion="user">
+      <div className="flex min-h-screen">
+        <aside className="sticky top-0 hidden h-screen w-[220px] shrink-0 overflow-y-auto lg:block">
+          <SidebarNav />
+        </aside>
 
-      <div className="flex min-w-0 flex-1 flex-col">
-        <div className="flex items-center gap-3 border-b border-sidebar-border bg-sidebar px-4 py-3 text-sidebar-foreground lg:hidden">
-          <Sheet open={menuOpen} onOpenChange={setMenuOpen}>
-            <SheetTrigger
-              render={
-                <button
-                  type="button"
-                  aria-label="Open navigation menu"
-                  className="rounded-md p-1.5 outline-none hover:bg-sidebar-accent focus-visible:ring-2 focus-visible:ring-sidebar-primary"
-                />
-              }
-            >
-              <Menu className="size-5" />
-            </SheetTrigger>
-            <SheetContent
-              side="left"
-              className="w-[264px] max-w-[80vw] border-0 p-0"
-            >
-              <SheetTitle className="sr-only">Navigation</SheetTitle>
-              <SidebarNav onNavigate={() => setMenuOpen(false)} />
-            </SheetContent>
-          </Sheet>
-          <div className="flex items-center gap-2">
-            <div className="size-5 shrink-0 rounded bg-sidebar-primary" />
-            <span className="text-[15px] font-extrabold text-sidebar-primary-foreground">
-              Invoicely
-            </span>
+        <div className="flex min-w-0 flex-1 flex-col">
+          <div className="flex items-center gap-3 border-b border-sidebar-border bg-sidebar px-4 py-3 text-sidebar-foreground lg:hidden">
+            <Sheet open={menuOpen} onOpenChange={setMenuOpen}>
+              <SheetTrigger
+                render={
+                  <button
+                    type="button"
+                    aria-label="Open navigation menu"
+                    className="rounded-md p-1.5 outline-none hover:bg-sidebar-accent focus-visible:ring-2 focus-visible:ring-sidebar-primary"
+                  />
+                }
+              >
+                <Menu className="size-5" />
+              </SheetTrigger>
+              <SheetContent
+                side="left"
+                className="w-[264px] max-w-[80vw] border-0 p-0"
+              >
+                <SheetTitle className="sr-only">Navigation</SheetTitle>
+                <SidebarNav onNavigate={() => setMenuOpen(false)} />
+              </SheetContent>
+            </Sheet>
+            <div className="flex items-center gap-2">
+              <div className="size-5 shrink-0 rounded bg-sidebar-primary" />
+              <span className="text-[15px] font-extrabold text-sidebar-primary-foreground">
+                Invoicely
+              </span>
+            </div>
           </div>
-        </div>
 
-        <main id="main-content" className="flex min-w-0 flex-1 flex-col">
-          {children}
-        </main>
+          <main id="main-content" className="flex min-w-0 flex-1 flex-col">
+            <motion.div
+              key={pathname}
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.2, ease: "easeOut" }}
+              className="flex min-w-0 flex-1 flex-col"
+            >
+              {children}
+            </motion.div>
+          </main>
+        </div>
       </div>
-    </div>
+    </MotionConfig>
   );
 }
