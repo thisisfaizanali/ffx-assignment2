@@ -3,9 +3,11 @@
 import { ErrorState } from "@/components/error-state";
 import { InvoiceTable } from "@/components/invoices/invoice-table";
 import { useInvoices } from "@/hooks/use-invoices";
+import { useTableQuery } from "@/hooks/use-table-query";
 
 export function InvoiceListing() {
-  const { data, error, isLoading, refetch } = useInvoices({});
+  const { query } = useTableQuery();
+  const { data, error, isLoading, refetch } = useInvoices(query);
 
   if (error) return <ErrorState message={error.message} onRetry={refetch} />;
 
