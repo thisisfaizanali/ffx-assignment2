@@ -53,13 +53,13 @@ export function LineItemsEditor({
       <div className="mb-2 text-xs font-semibold text-foreground/80">
         Line Items
       </div>
-      <div className="mb-3.5 overflow-hidden rounded-lg border border-border">
+      <div className="mb-3.5 overflow-x-auto rounded-lg border border-border">
         {fields.map((field, i) => {
           const rowError = errors?.[i];
           return (
             <div
               key={field.key}
-              className="grid grid-cols-[2.4fr_0.7fr_0.9fr_0.9fr_32px] gap-x-2.5 gap-y-1 border-b border-border p-3 last:border-b-0"
+              className="grid min-w-[520px] grid-cols-[2.4fr_0.7fr_0.9fr_0.9fr_32px] gap-x-2.5 gap-y-1 border-b border-border p-3 last:border-b-0"
             >
               <Input
                 aria-label={`Line ${i + 1} description`}

@@ -29,7 +29,7 @@ export function KpiCards({ totals }: { totals: InvoiceSummary["totals"] }) {
   ];
 
   return (
-    <div className="mb-8 grid grid-cols-[repeat(auto-fit,minmax(230px,1fr))] gap-4">
+    <div className="mb-8 grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
       {cards.map((card, i) => (
         <motion.div
           key={card.label}
