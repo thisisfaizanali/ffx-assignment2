@@ -24,3 +24,10 @@ export function daysUntil(iso: string): number {
     (Date.parse(`${iso}T00:00:00Z`) - Date.parse(`${TODAY}T00:00:00Z`)) / day,
   );
 }
+
+/** `iso` shifted by `days`, still a `YYYY-MM-DD` string. */
+export function addDays(iso: string, days: number): string {
+  return new Date(Date.parse(`${iso}T00:00:00Z`) + days * 86_400_000)
+    .toISOString()
+    .slice(0, 10);
+}
