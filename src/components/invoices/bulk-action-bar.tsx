@@ -2,25 +2,49 @@
 
 import { AnimatePresence, motion } from "framer-motion";
 import { Loader2 } from "lucide-react";
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
 const barButton =
-  "text-[13px] font-medium text-sidebar-foreground/80 transition-colors hover:text-sidebar-foreground disabled:opacity-50";
+  "inline-flex items-center gap-1.5 text-[13px] font-medium text-sidebar-foreground/80 transition-colors hover:text-sidebar-foreground disabled:opacity-50";
+
+type Busy = "export" | "markPaid" | "delete" | null;
 
 interface Props {
   count: number;
-  onClear: () => void;
-  onExport: () => void;
-  exporting: boolean;
+  busy: Busy;
   canExport: boolean;
+  canMarkPaid: boolean;
+  canDelete: boolean;
+  onExport: () => void;
+  onMarkPaid: () => void;
+  onDelete: () => void;
+  onClear: () => void;
 }
 
 export function BulkActionBar({
   count,
-  onClear,
-  onExport,
-  exporting,
+  busy,
   canExport,
+  canMarkPaid,
+  canDelete,
+  onExport,
+  onMarkPaid,
+  onDelete,
+  onClear,
 }: Props) {
+  const [confirmOpen, setConfirmOpen] = useState(false);
+
   return (
     <AnimatePresence initial={false}>
       {count > 0 && (
@@ -38,12 +62,67 @@ export function BulkActionBar({
             <button
               type="button"
               onClick={onExport}
-              disabled={exporting}
-              className={`inline-flex items-center gap-1.5 ${barButton}`}
+              disabled={busy !== null}
+              className={barButton}
             >
-              {exporting && <Loader2 className="size-3.5 animate-spin" />}
+              {busy === "export" && <Loader2 className="size-3.5 animate-spin" />}
               Export CSV
             </button>
+          )}
+
+          {canMarkPaid && (
+            <button
+              type="button"
+              onClick={onMarkPaid}
+              disabled={busy !== null}
+              className={barButton}
+            >
+              {busy === "markPaid" && (
+                <Loader2 className="size-3.5 animate-spin" />
+              )}
+              Mark as Paid
+            </button>
+          )}
+
+          {canDelete && (
+            <Dialog open={confirmOpen} onOpenChange={setConfirmOpen}>
+              <DialogTrigger
+                render={
+                  <button
+                    type="button"
+                    disabled={busy !== null}
+                    className={`${barButton} text-[color:oklch(0.78_0.1_25)] hover:text-[color:oklch(0.86_0.1_25)]`}
+                  />
+                }
+              >
+                Delete
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Delete {count} invoices?</DialogTitle>
+                  <DialogDescription>
+                    The selected invoices will be permanently removed. This can’t
+                    be undone.
+                  </DialogDescription>
+                </DialogHeader>
+                <DialogFooter>
+                  <DialogClose render={<Button variant="outline" />}>
+                    Cancel
+                  </DialogClose>
+                  <Button
+                    variant="destructive"
+                    className="bg-destructive text-white hover:bg-destructive/90"
+                    onClick={() => {
+                      setConfirmOpen(false);
+                      onDelete();
+                    }}
+                    disabled={busy !== null}
+                  >
+                    Delete invoices
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
           )}
 
           <button

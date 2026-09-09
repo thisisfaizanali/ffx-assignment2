@@ -66,6 +66,29 @@ export function InvoiceListing() {
   const clearSelection = useCallback(() => setSelectedIds(new Set()), []);
 
   const [exporting, setExporting] = useState(false);
+  const [bulkBusy, setBulkBusy] = useState<"markPaid" | "delete" | null>(null);
+
+  async function runBulk(action: "markPaid" | "delete") {
+    setBulkBusy(action);
+    try {
+      const { affected } = await api.invoices.bulk({
+        ids: [...selectedIds],
+        action,
+      });
+      const noun = `invoice${affected === 1 ? "" : "s"}`;
+      toast.success(
+        action === "markPaid"
+          ? `Marked ${affected} ${noun} as paid`
+          : `Deleted ${affected} ${noun}`,
+      );
+      clearSelection();
+      refetch();
+    } catch (e) {
+      toast.error(e instanceof ApiError ? e.message : "Bulk action failed");
+    } finally {
+      setBulkBusy(null);
+    }
+  }
 
   async function exportCsv() {
     setExporting(true);
@@ -101,10 +124,14 @@ export function InvoiceListing() {
       {canBulk && (
         <BulkActionBar
           count={selectedIds.size}
-          onClear={clearSelection}
-          onExport={exportCsv}
-          exporting={exporting}
+          busy={exporting ? "export" : bulkBusy}
           canExport={can(role, "export")}
+          canMarkPaid={can(role, "bulkEdit")}
+          canDelete={can(role, "delete")}
+          onExport={exportCsv}
+          onMarkPaid={() => runBulk("markPaid")}
+          onDelete={() => runBulk("delete")}
+          onClear={clearSelection}
         />
       )}
 
