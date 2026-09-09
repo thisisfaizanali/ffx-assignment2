@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { InvoiceForm } from "@/components/invoices/invoice-form";
 import { PageHeader } from "@/components/page-header";
+import { PermissionGate } from "@/components/permission-gate";
 import * as store from "@/server/store";
 
 export default async function EditInvoicePage({
@@ -15,7 +16,9 @@ export default async function EditInvoicePage({
     <>
       <PageHeader title="Edit Invoice" subtitle={invoice.number} />
       <div className="flex-1 overflow-y-auto p-8">
-        <InvoiceForm mode="edit" invoice={invoice} />
+        <PermissionGate action="edit">
+          <InvoiceForm mode="edit" invoice={invoice} />
+        </PermissionGate>
       </div>
     </>
   );

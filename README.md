@@ -24,6 +24,8 @@ This project uses [`next/font`](https://nextjs.org/docs/app/building-your-applic
 
 Server reads (page loads, `not-found`) hit the in-memory data source directly; all client interactions — filtering, pagination, and every mutation — go through the REST route handlers under `/api/invoices`.
 
+The role selector is a client-side demo control with no auth behind it, so permissions are enforced in the UI layer (the `can()` matrix in `src/lib/permissions.ts`, applied to both controls and the `/invoices/new` and `/invoices/[id]/edit` routes); with real auth the same matrix would be applied in the route handlers.
+
 ## Deploy on Vercel
 
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
