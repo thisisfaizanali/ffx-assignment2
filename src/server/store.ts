@@ -59,18 +59,22 @@ function compare(a: Invoice, b: Invoice, key: SortKey): number {
   return av < bv ? -1 : av > bv ? 1 : 0;
 }
 
-export interface QueryArgs {
+export interface FilterArgs {
   search?: string;
   status?: InvoiceStatus[];
   from?: string;
   to?: string;
   sort: SortKey;
   dir: "asc" | "desc";
+}
+
+export interface QueryArgs extends FilterArgs {
   page: number;
   pageSize: number;
 }
 
-export function query(args: QueryArgs): Paginated<Invoice> {
+/** Filter + sort the full set, before pagination. Shared by the list and export endpoints. */
+export function filterSort(args: FilterArgs): Invoice[] {
   let list = state().invoices;
 
   if (args.search) {
@@ -89,8 +93,11 @@ export function query(args: QueryArgs): Paginated<Invoice> {
   if (args.to) list = list.filter((i) => i.issueDate <= args.to!);
 
   const dir = args.dir === "asc" ? 1 : -1;
-  list = [...list].sort((a, b) => compare(a, b, args.sort) * dir);
+  return [...list].sort((a, b) => compare(a, b, args.sort) * dir);
+}
 
+export function query(args: QueryArgs): Paginated<Invoice> {
+  const list = filterSort(args);
   const total = list.length;
   const totalPages = Math.max(1, Math.ceil(total / args.pageSize));
   const page = Math.min(args.page, totalPages);

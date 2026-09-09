@@ -50,8 +50,13 @@ export const listQuerySchema = z.object({
   sort: z.enum(SORT_KEYS).default("issueDate"),
   dir: z.enum(["asc", "desc"]).default("desc"),
   page: z.coerce.number().int().min(1).default(1),
-  // Generous ceiling so CSV export can pull the whole filtered set in one request.
-  pageSize: z.coerce.number().int().min(1).max(5000).default(25),
+  pageSize: z.coerce.number().int().min(1).max(100).default(25),
+});
+
+/** Same filters as the list, no pagination — CSV export pulls the whole matching set. */
+export const exportQuerySchema = listQuerySchema.omit({
+  page: true,
+  pageSize: true,
 });
 
 export const bulkActionSchema = z.object({
@@ -63,4 +68,5 @@ export type InvoiceInput = z.infer<typeof invoiceInputSchema>;
 export type CreateInvoiceInput = z.infer<typeof createInvoiceSchema>;
 export type UpdateInvoiceInput = z.infer<typeof updateInvoiceSchema>;
 export type ListQuery = z.infer<typeof listQuerySchema>;
+export type ExportQuery = z.infer<typeof exportQuerySchema>;
 export type BulkAction = z.infer<typeof bulkActionSchema>;

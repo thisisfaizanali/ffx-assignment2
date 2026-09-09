@@ -16,7 +16,7 @@ import { downloadCsv, toCsv } from "@/lib/csv";
 import { can } from "@/lib/permissions";
 
 export function InvoiceListing() {
-  const { role } = useRole();
+  const { role, hydrated } = useRole();
   const {
     query,
     setFilters,
@@ -30,7 +30,8 @@ export function InvoiceListing() {
   const { data, error, isLoading, refetch } = useInvoices(query);
 
   const canBulk =
-    can(role, "bulkEdit") || can(role, "delete") || can(role, "export");
+    hydrated &&
+    (can(role, "bulkEdit") || can(role, "delete") || can(role, "export"));
 
   const [selectedIds, setSelectedIds] = useState<Set<string>>(
     () => new Set(),
@@ -93,11 +94,19 @@ export function InvoiceListing() {
   async function exportCsv() {
     setExporting(true);
     try {
-      const all = await api.invoices.list({ ...query, page: 1, pageSize: 5000 });
+      // No page / pageSize — the export route returns the full matching set.
+      const all = await api.invoices.export({
+        search: query.search,
+        status: query.status,
+        from: query.from,
+        to: query.to,
+        sort: query.sort,
+        dir: query.dir,
+      });
       const rows =
         selectedIds.size > 0
-          ? all.data.filter((r) => selectedIds.has(r.id))
-          : all.data;
+          ? all.filter((r) => selectedIds.has(r.id))
+          : all;
       downloadCsv(`invoices-${TODAY}.csv`, toCsv(rows));
       toast.success(
         `Exported ${rows.length} invoice${rows.length === 1 ? "" : "s"} to CSV`,

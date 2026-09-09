@@ -7,6 +7,7 @@ import type {
 import type {
   BulkAction,
   CreateInvoiceInput,
+  ExportQuery,
   UpdateInvoiceInput,
 } from "@/lib/schemas";
 
@@ -63,6 +64,10 @@ export const api = {
   invoices: {
     list: (query: InvoiceQuery, signal?: AbortSignal) =>
       request<Paginated<Invoice>>(`/api/invoices${toQueryString(query)}`, {
+        signal,
+      }),
+    export: (query: ExportQuery, signal?: AbortSignal) =>
+      request<Invoice[]>(`/api/invoices/export${toQueryString(query)}`, {
         signal,
       }),
     summary: (signal?: AbortSignal) =>
