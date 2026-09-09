@@ -36,14 +36,19 @@ function isDueSoon(invoice: Invoice): boolean {
   return d >= 0 && d <= 7;
 }
 
-function SkeletonRow() {
+function SkeletonRow({ showSelection }: { showSelection: boolean }) {
   return (
     <TableRow className="hover:bg-transparent">
-      <TableCell>
-        <Skeleton className="size-4 rounded-[4px]" />
-      </TableCell>
+      {showSelection && (
+        <TableCell>
+          <Skeleton className="size-4 rounded-[4px]" />
+        </TableCell>
+      )}
       {COLUMNS.map((col, i) => (
-        <TableCell key={col.key} className={col.align === "right" ? "text-right" : undefined}>
+        <TableCell
+          key={col.key}
+          className={col.align === "right" ? "text-right" : undefined}
+        >
           <Skeleton
             className={cn(
               "h-3.5",
@@ -68,6 +73,12 @@ interface InvoiceTableProps {
   onSort: (key: SortKey) => void;
   isLoading: boolean;
   hasActiveFilters: boolean;
+  showSelection: boolean;
+  selectedIds: Set<string>;
+  allOnPageSelected: boolean;
+  pageIndeterminate: boolean;
+  onToggleRow: (id: string) => void;
+  onTogglePage: () => void;
 }
 
 export function InvoiceTable({
@@ -77,6 +88,12 @@ export function InvoiceTable({
   onSort,
   isLoading,
   hasActiveFilters,
+  showSelection,
+  selectedIds,
+  allOnPageSelected,
+  pageIndeterminate,
+  onToggleRow,
+  onTogglePage,
 }: InvoiceTableProps) {
   const router = useRouter();
   const showSkeleton = isLoading && rows.length === 0;
@@ -87,9 +104,16 @@ export function InvoiceTable({
       <Table className="min-w-[820px]">
         <TableHeader>
           <TableRow className="hover:bg-transparent">
-            <TableHead className="w-10">
-              <span className="sr-only">Select</span>
-            </TableHead>
+            {showSelection && (
+              <TableHead className="w-10">
+                <Checkbox
+                  aria-label="Select all invoices on this page"
+                  checked={allOnPageSelected}
+                  indeterminate={pageIndeterminate}
+                  onCheckedChange={onTogglePage}
+                />
+              </TableHead>
+            )}
             {COLUMNS.map((col) => (
               <TableHead
                 key={col.key}
@@ -124,10 +148,13 @@ export function InvoiceTable({
         </TableHeader>
         <TableBody>
           {showSkeleton
-            ? Array.from({ length: 8 }).map((_, i) => <SkeletonRow key={i} />)
+            ? Array.from({ length: 8 }).map((_, i) => (
+                <SkeletonRow key={i} showSelection={showSelection} />
+              ))
             : rows.map((row) => (
                 <TableRow
                   key={row.id}
+                  data-state={selectedIds.has(row.id) ? "selected" : undefined}
                   onClick={(e) => {
                     if (
                       e.target instanceof HTMLElement &&
@@ -139,9 +166,15 @@ export function InvoiceTable({
                   }}
                   className="cursor-pointer"
                 >
-                  <TableCell>
-                    <Checkbox aria-label={`Select ${row.number}`} />
-                  </TableCell>
+                  {showSelection && (
+                    <TableCell>
+                      <Checkbox
+                        aria-label={`Select ${row.number}`}
+                        checked={selectedIds.has(row.id)}
+                        onCheckedChange={() => onToggleRow(row.id)}
+                      />
+                    </TableCell>
+                  )}
                   <TableCell className="font-mono text-[13px]">
                     <Link
                       href={`/invoices/${row.id}`}
@@ -191,7 +224,9 @@ export function InvoiceTable({
       {showEmpty && (
         <div className="px-5 py-16 text-center">
           <p className="text-sm font-semibold">
-            {hasActiveFilters ? "No invoices match your filters" : "No invoices yet"}
+            {hasActiveFilters
+              ? "No invoices match your filters"
+              : "No invoices yet"}
           </p>
           <p className="mt-1 text-[13px] text-muted-foreground">
             {hasActiveFilters

@@ -34,7 +34,7 @@ export function InvoiceActions({
   invoice: Invoice;
   onUpdate: (invoice: Invoice) => void;
 }) {
-  const role = useRole();
+  const { role } = useRole();
   const router = useRouter();
   const [busy, setBusy] = useState<"markPaid" | "delete" | null>(null);
   const [confirmOpen, setConfirmOpen] = useState(false);
