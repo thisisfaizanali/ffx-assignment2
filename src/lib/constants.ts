@@ -3,10 +3,12 @@ export const CURRENCY = "USD";
 export const LOCALE = "en-US";
 
 /**
- * Fixed reference date. Seeded data and any "overdue" / "due soon" math key off
- * this so screenshots and tests stay stable regardless of the wall clock.
+ * Reference "today", anchored to the real current date at module load and
+ * normalised to a date-only `YYYY-MM-DD` string. Seeded data and any overdue /
+ * due-soon math key off this, so the date window slides forward with real time
+ * while `mulberry32(42)` keeps the dataset shape identical run to run.
  */
-export const TODAY = "2026-09-09";
+export const TODAY = new Date().toISOString().slice(0, 10);
 
 /** Known clients, offered as datalist suggestions on the invoice form. */
 export const COMPANIES = [
