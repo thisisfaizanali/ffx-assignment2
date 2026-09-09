@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect, useRef } from "react";
 import { buttonVariants } from "@/components/ui/button";
 import { StatusBadge } from "@/components/status-badge";
 import { TAX_RATE } from "@/lib/constants";
@@ -17,6 +18,15 @@ const PRINT_CSS = `
 `;
 
 export function PrintInvoice({ invoice }: { invoice: Invoice }) {
+  // "Download Invoice" lands here; open the print dialog straight away so the
+  // action does something. The button below is the fallback if it's dismissed.
+  const printed = useRef(false);
+  useEffect(() => {
+    if (printed.current) return;
+    printed.current = true;
+    window.print();
+  }, []);
+
   return (
     <>
       <style>{PRINT_CSS}</style>
