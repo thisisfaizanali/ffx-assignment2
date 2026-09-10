@@ -16,23 +16,30 @@ export function RecentInvoices({ invoices }: { invoices: Invoice[] }) {
         </Link>
       </div>
       {invoices.map((inv) => (
+        /**
+         * Two rows on a phone (number + amount, then client + status), one row
+         * from `sm` up. The source order suits the stacked layout; `sm:order-*`
+         * puts the columns back in reading order on wider screens.
+         */
         <Link
           key={inv.id}
           href={`/invoices/${inv.id}`}
-          className="flex items-center gap-4 border-b border-border px-[22px] py-3.5 transition-colors last:border-0 hover:bg-accent"
+          className="grid grid-cols-[1fr_auto] items-center gap-x-4 gap-y-1.5 border-b border-border px-[22px] py-3.5 transition-colors last:border-0 hover:bg-accent sm:flex sm:gap-4"
         >
-          <span className="w-[130px] shrink-0 font-mono text-[13px] text-muted-foreground">
+          <span className="min-w-0 truncate font-mono text-[13px] text-muted-foreground sm:order-1 sm:w-[130px] sm:shrink-0">
             {inv.number}
           </span>
-          <span className="min-w-0 flex-1 truncate text-sm font-medium">
+          <span className="justify-self-end font-mono text-[13px] font-semibold sm:order-5 sm:w-[100px] sm:text-right">
+            {formatCurrency(inv.amount)}
+          </span>
+          <span className="min-w-0 truncate text-sm font-medium sm:order-2 sm:flex-1">
             {inv.client}
           </span>
-          <span className="hidden w-[90px] shrink-0 text-[13px] text-muted-foreground sm:block">
+          <span className="hidden text-[13px] text-muted-foreground sm:order-3 sm:block sm:w-[90px] sm:shrink-0">
             {formatDate(inv.issueDate)}
           </span>
-          <StatusBadge status={inv.status} />
-          <span className="w-[100px] shrink-0 text-right font-mono text-[13px] font-semibold">
-            {formatCurrency(inv.amount)}
+          <span className="justify-self-end sm:order-4">
+            <StatusBadge status={inv.status} />
           </span>
         </Link>
       ))}
