@@ -37,8 +37,8 @@ that gates destructive and editing actions.
 Requires **Node 20 or newer** and npm.
 
 ```bash
-git clone https://github.com/thisisfaizanali/ffx-assignment2.git
-cd ffx-assignment2
+git clone https://github.com/thisisfaizanali/invoicely.git
+cd invoicely
 npm install
 npm run dev
 ```
