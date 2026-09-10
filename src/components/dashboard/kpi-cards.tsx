@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { formatCurrency } from "@/lib/format";
+import { formatCompactCurrency, formatCurrency } from "@/lib/format";
 import type { InvoiceSummary } from "@/lib/types";
 
 export function KpiCards({ totals }: { totals: InvoiceSummary["totals"] }) {
@@ -18,7 +18,8 @@ export function KpiCards({ totals }: { totals: InvoiceSummary["totals"] }) {
     },
     {
       label: "Pending Amount",
-      value: formatCurrency(totals.pendingAmount),
+      value: formatCompactCurrency(totals.pendingAmount),
+      exact: formatCurrency(totals.pendingAmount),
       sub: `${totals.pendingCount} invoices awaiting payment`,
     },
     {
@@ -41,7 +42,10 @@ export function KpiCards({ totals }: { totals: InvoiceSummary["totals"] }) {
           <div className="mb-3.5 font-mono text-[11px] tracking-[0.08em] text-muted-foreground uppercase">
             {card.label}
           </div>
-          <div className="mb-2 text-[32px] leading-none font-extrabold tracking-[-0.01em]">
+          <div
+            title={card.exact}
+            className="mb-2 text-[32px] leading-none font-extrabold tracking-[-0.01em]"
+          >
             {card.value}
           </div>
           <div className="text-[13px] text-muted-foreground">{card.sub}</div>

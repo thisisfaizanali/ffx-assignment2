@@ -6,7 +6,7 @@ const HEADERS = [
   "Client",
   "Issue Date",
   "Due Date",
-  "Amount",
+  "Amount (INR)",
   "Status",
 ];
 

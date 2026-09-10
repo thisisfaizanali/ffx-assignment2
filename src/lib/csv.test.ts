@@ -23,7 +23,7 @@ describe("toCsv (RFC 4180)", () => {
   it("quotes every field and emits the header row", () => {
     const [header, row] = toCsv([inv()]).split("\r\n");
     expect(header).toBe(
-      '"Invoice #","Client","Issue Date","Due Date","Amount","Status"',
+      '"Invoice #","Client","Issue Date","Due Date","Amount (INR)","Status"',
     );
     expect(row.startsWith('"INV-2026-00001","Acme",')).toBe(true);
     expect(row.endsWith('"108.00","pending"')).toBe(true);
