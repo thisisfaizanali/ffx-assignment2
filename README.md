@@ -5,7 +5,7 @@ invoice table with bulk actions and CSV export, an invoice detail view, and a
 create/edit form, with a simulated role switcher (Admin / Accountant / Viewer)
 that gates destructive and editing actions.
 
-![Invoicely dashboard](docs/dashboard.jpg)
+![Invoicely dashboard](docs/dashboard.png)
 
 **Live demo:** https://ffx-assignment2.vercel.app
 
